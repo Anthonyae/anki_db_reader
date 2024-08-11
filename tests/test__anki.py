@@ -28,7 +28,7 @@ def test_query_exception_handling():
     anki = AnkiDB()
     # raise an exception if the query is invalid
     with pytest.raises(Exception) as exc_info:
-        anki.query_db("select 1 as not_working_sql")
+        anki.query_db("select not_working_sql")
 
     # Now you can check the exception if needed
     assert str(exc_info.value) != "", "Exception should contain an error message"
