@@ -1,17 +1,21 @@
 """This module provides functions for querying the Anki database."""
 
+import os
 import platform
 import re
 import sqlite3
 
 import pandas as pd
+from dotenv import load_dotenv
 
-ANKI_DB_PATH = r"C:\Users\Antho\AppData\Roaming\Anki2\User 1\collection.anki2"
+load_dotenv(dotenv_path=".env")
+
+ANKI_DB = os.getenv("ANKI_DB", "")
 
 system_name = platform.system()
 if "microsoft" in platform.uname().release.lower():
-    drive, path = ANKI_DB_PATH.split(":", 1)
-    ANKI_DB_PATH = r"/mnt/" + drive.lower() + path.replace("\\", "/")
+    drive, path = ANKI_DB.split(":", 1)
+    ANKI_DB = r"/mnt/" + drive.lower() + path.replace("\\", "/")
 
 
 def unicase_collation(s1, s2):
@@ -27,7 +31,7 @@ class AnkiDB:
 
     def query_db(self, query: str) -> list:
         """Returns a result set from anki database."""
-        conn = sqlite3.connect(ANKI_DB_PATH)
+        conn = sqlite3.connect(ANKI_DB)
         conn.create_collation("unicase", unicase_collation)
         cursor = conn.cursor()
         cursor.execute(query)
@@ -35,7 +39,7 @@ class AnkiDB:
         return query_result
 
     def get_user_reviews(self, ending_params: str | None = None) -> pd.DataFrame:
-        """Returns data on reviews completed in Anki.
+        """Returns general data on reviews completed in Anki.
 
         Note:
         - ending_params is to be used for any extra sql that would be
