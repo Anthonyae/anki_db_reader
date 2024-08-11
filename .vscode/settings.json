@@ -1,0 +1,75 @@
+{
+    "peacock.remoteColor": "#832544",
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "editor.formatOnSave": true,
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "isort.args": [
+        "--settings-path=${workspaceFolder}/pyproject.toml"
+    ],
+    "black-formatter.args": [
+        "--config=${workspaceFolder}/pyproject.toml"
+    ],
+    "mypy-type-checker.args": [
+        "--config-file=${workspaceFolder}/pyproject.toml"
+    ],
+    "pylint.args": [
+        "--rcfile=${workspaceFolder}/pyproject.toml"
+    ],
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.formatOnSave": true,
+    },
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.indexing": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.completeFunctionParens": true,
+    "editor.rulers": [
+        {
+            "column": 99,
+            "color": "#dad9c2"
+        },
+        {
+            "column": 119,
+            "color": "#d1a7ae"
+        }
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/__pycache__": true
+    },
+    "explorerExclude.backup": {},
+    "window.zoomLevel": -1,
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#ab3059",
+        "activityBar.background": "#ab3059",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#1a320e",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#ab3059",
+        "statusBar.background": "#832544",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#ab3059",
+        "statusBarItem.remoteBackground": "#832544",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#832544",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#83254499",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    } // Adjust this value to change the zoom level
+}
