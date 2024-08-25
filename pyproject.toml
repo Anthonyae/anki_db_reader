@@ -2,10 +2,9 @@
 requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-
 [project]
 name = "anki_reader"
-description = "A package for reading anki database."
+description = "A package for reading Anki database."
 authors = [{ name = "Tony", email = "cordial.egg1739@fastmail.com" }]
 readme = "README.md"
 requires-python = ">=3.10"
@@ -19,23 +18,15 @@ dependencies = [
 ]
 dynamic = ["version"]
 
-
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
 release = ["build", "twine"]
 static-code-qa = ["pre-commit"]
 dev = ["py_teamup[test,release,static-code-qa]"]
 
-
 # docs: https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#dynamic-metadata
 [tool.setuptools.dynamic]
 version = { file = "version.txt" }
-
-[tool.pytest.ini_options]
-markers = [
-    "calls_api: marks test that calls api. (deselect with '-m \"not calls_api\"')",
-]
-
 
 [tool.pylint."messages control"]
 disable = [

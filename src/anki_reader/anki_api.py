@@ -6,16 +6,15 @@ import re
 import sqlite3
 
 import pandas as pd
-from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=".env")
 
-ANKI_DB = os.getenv("ANKI_DB", "")
-
-system_name = platform.system()
-if "microsoft" in platform.uname().release.lower():
-    drive, path = ANKI_DB.split(":", 1)
-    ANKI_DB = r"/mnt/" + drive.lower() + path.replace("\\", "/")
+def load_env_vars() -> str:
+    """Load environment variables from .env file."""
+    ANKI_DB = os.getenv("ANKI_DB", "")
+    if "microsoft" in platform.uname().release.lower():
+        drive, path = ANKI_DB.split(":", 1)
+        ANKI_DB = r"/mnt/" + drive.lower() + path.replace("\\", "/")
+    return ANKI_DB
 
 
 def unicase_collation(s1, s2):
@@ -31,6 +30,7 @@ class AnkiDB:
 
     def query_db(self, query: str) -> list:
         """Returns a result set from anki database."""
+        ANKI_DB = load_env_vars()
         conn = sqlite3.connect(ANKI_DB)
         conn.create_collation("unicase", unicase_collation)
         cursor = conn.cursor()
@@ -42,8 +42,11 @@ class AnkiDB:
         """Returns general data on reviews completed in Anki.
 
         Note:
-        - ending_params is to be used for any extra sql that would be
-        valid after the from caluse. i.e (where, limit, ect)
+            - ending_params is to be used for any extra sql that would be valid after
+            the from caluse. i.e (where, limit, ect)
+
+        Example:
+            - "where review_at_utc >= date('{start_date}') and review_at_utc <= date('{end_date}')"
         """
         sql_for_reviews = f"""
             with reviews as (
