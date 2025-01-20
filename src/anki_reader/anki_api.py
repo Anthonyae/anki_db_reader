@@ -1,24 +1,44 @@
 """This module provides functions for querying the Anki database."""
 
 import os
-import platform
 import re
 import sqlite3
 
 import pandas as pd
 
 
+def windows_to_wsl_path(path_str: str) -> str:
+    """Convert a Windows path to a WSL path.
+
+    Convert the drive letter to lowercase and prepend /mnt/ to the path.
+    """
+    is_running_in_wsl = (
+        os.path.exists("/proc/sys/kernel/osrelease")
+        and "microsoft" in open("/proc/sys/kernel/osrelease").read().lower()
+    )
+    if is_running_in_wsl:
+        drive, rest_of_path = path_str.split(":\\", 1)
+        rest_of_path = rest_of_path.replace("\\", "/")
+        linux_path = f"/mnt/{drive.lower()}/{rest_of_path}"
+        path_str = linux_path
+    else:
+        path_str = path_str
+    return path_str
+
+
 def load_env_vars() -> str:
     """Load environment variables from .env file."""
     ANKI_DB = os.getenv("ANKI_DB", "")
-    if "microsoft" in platform.uname().release.lower():
-        drive, path = ANKI_DB.split(":", 1)
-        ANKI_DB = r"/mnt/" + drive.lower() + path.replace("\\", "/")
+    # Determine if the path is a windows path and convert it to a linux path
+    ANKI_DB = windows_to_wsl_path(ANKI_DB)
     return ANKI_DB
 
 
-def unicase_collation(s1, s2):
-    """A utility function that provides collation for handling queries involving tables with non standard text in sqlite3."""
+def unicase_collation(s1, s2) -> bool:
+    """A utility function that provides collation for handling queries involving tables with non standard text in sqlite3.
+
+    Returns: wether the two strings are equal or not.
+    """
     return s1.lower() == s2.lower()
 
 
@@ -26,12 +46,11 @@ class AnkiDB:
     """Returns an object for interacting with the Anki database."""
 
     def __init__(self):  # noqa: D107
-        self.review_id_file = "anki_submitted_review_entries.json"
+        self.ANKI_DATABASE_PATH = load_env_vars()
 
     def query_db(self, query: str) -> list:
         """Returns a result set from anki database."""
-        ANKI_DB = load_env_vars()
-        conn = sqlite3.connect(ANKI_DB)
+        conn = sqlite3.connect(self.ANKI_DATABASE_PATH)
         conn.create_collation("unicase", unicase_collation)
         cursor = conn.cursor()
         cursor.execute(query)
@@ -45,8 +64,9 @@ class AnkiDB:
             - ending_params is to be used for any extra sql that would be valid after
             the from caluse. i.e (where, limit, ect)
 
-        Example:
-            - "where review_at_utc >= date('{start_date}') and review_at_utc <= date('{end_date}')"
+        Examples:
+            - "where review_at_utc >= date('{YYY-MM-DD}') and review_at_utc <= date('{YYYY-MM-DD}') limit 5"
+            - "where review_at_utc >= date('2025-01-01') limit 5"
         """
         sql_for_reviews = f"""
             with reviews as (
@@ -98,7 +118,7 @@ class AnkiDB:
             "deck_name": str,
         }
         reviews = self.query_db(sql_for_reviews)
-        review_df = pd.DataFrame(reviews, columns=review_columns.keys())
+        review_df = pd.DataFrame(reviews, columns=review_columns.keys())  # type: ignore
         # Convert columns to specified data types
         for col, dtype in review_columns.items():
             review_df[col] = review_df[col].astype(dtype)
